@@ -144,6 +144,10 @@ def analyze_videos(
     --------
 
     """
+
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_memory_growth(gpus[0], True)
+
     if "TF_CUDNN_USE_AUTOTUNE" in os.environ:
         del os.environ["TF_CUDNN_USE_AUTOTUNE"]  # was potentially set during training
 
@@ -649,6 +653,18 @@ def GetPoseDynamic(
     pbar.close()
     return PredictedData, nframes
 
+def count_frames_manual(path):
+    video = cv2.VideoCapture(path)
+    total = 0
+
+    while True:
+        (grabbed, frame) = video.read()
+        if not grabbed:
+            break
+        
+        total += 1
+    
+    return total
 
 def AnalyzeVideo(
     video,
@@ -686,6 +702,9 @@ def AnalyzeVideo(
             5
         )  # https://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html#videocapture-get
         nframes = int(cap.get(7))
+
+        # Fix for cap.get(7) returning 0.0
+        if nframes == 0.0: nframes = count_frames_manual(video)
         duration = nframes * 1.0 / fps
         size = (int(cap.get(4)), int(cap.get(3)))
 

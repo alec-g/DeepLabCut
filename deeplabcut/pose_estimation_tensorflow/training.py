@@ -116,6 +116,9 @@ def train_network(
     """
     import tensorflow as tf
 
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_memory_growth(gpus[0], True)
+
     vers = (tf.__version__).split(".")
     if int(vers[0]) == 1 and int(vers[1]) > 12:
         TF = tf.compat.v1

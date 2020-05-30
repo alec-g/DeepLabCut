@@ -588,6 +588,9 @@ def evaluate_network(
         from deeplabcut.utils import auxiliaryfunctions
         import tensorflow as tf
 
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        tf.config.experimental.set_memory_growth(gpus[0], True)
+
         if "TF_CUDNN_USE_AUTOTUNE" in os.environ:
             del os.environ[
                 "TF_CUDNN_USE_AUTOTUNE"
